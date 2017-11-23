@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.2.0/css/ol.css" type="text/css">
+    <style>
+html,body,#map { width:100%; height:100%; margin:0; }
+#map {
+    position: absolute;
+    z-index: 5;
+}
+#msg{
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    transform: translate(-50%, 5px);
+    background-color: rgba(40,40,40,.8);
+    padding: 10px;
+    color: #eee;
+    width: 350px;
+    text-align: center;
+}
+.ol-control button{ 
+  background-color: rgba(40, 40, 40, 0.85) !important;
+}
+.ol-control button:hover{ 
+  background-color: rgba(40, 40, 40, 1) !important;
+}
+    </style>
+    <script src="https://openlayers.org/en/v4.2.0/build/ol.js" type="text/javascript"></script>
+	<script src="https://cdn.rawgit.com/stefanpenner/es6-promise/master/dist/es6-promise.min.js" type="text/javascript"></script>
+	<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch" type="text/javascript"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
+	<link href="https://cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.min.css" rel="stylesheet">
+	<script src="https://unpkg.com/ol3-contextmenu"></script>
+	<title>The great pilgrimage</title>
+  </head>
+  <body>
+	<div id="map" class="map"></div>
+    <script type="text/javascript">
+	var div = document.createElement("div");
+	div.style.width = "100px";
+	div.style.height = "100px";
+	div.style.color = "white";
+	div.style.position = "absolute";
+	div.style.zIndex  = "1000";
+	div.style.float = "left";  
+	div.id = "bepbep"
+	div.innerHTML = "";
+	document.getElementById("map").appendChild(div);
+	
+var points = [],
+	features = [],
+    url_osrm_nearest = 'http://mekapaedia.com:5000/nearest/v1/driving/',
+    url_osrm_route = 'http://mekapaedia.com:5000/trip/v1/driving/',
+    icon_url = 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png',
+    vectorSource = new ol.source.Vector(),
+    vectorLayer = new ol.layer.Vector({
+      source: vectorSource
+    }),
+    styles = {
+      route: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          width: 6, color: [40, 40, 40, 0.8]
+        })
+      }),
+      icon: new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1],
+          src: icon_url
+        })
+      })
+    };
+
+var map = new ol.Map({
+  target: 'map',
+  layers: [
+    new ol.layer.Tile({
+      source: new ol.source.OSM()
+    }),
+    vectorLayer
+  ],
+  view: new ol.View({
+    center: [0, 0],
+    zoom: 5
+  }),
+  controls: []
+});
+
+
+
+if (typeof(Storage) !== "undefined") {
+	if(localStorage.position)
+	{
+		posarr = localStorage.position.split(",");
+		zoomval = parseFloat(localStorage.zoom);
+		longcoord = parseFloat(posarr[0]);
+		latcoord = parseFloat(posarr[1]);
+		map.getView().setCenter([longcoord, latcoord]);
+		map.getView().setZoom(zoomval);
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+		if (xhr.readyState == XMLHttpRequest.DONE) {
+			alert(xhr.responseText);
+			}
+		}
+		xhr.open('GET', 'saver.cgi?getsstuff=please', true);
+		xhr.send(null);
+	}
+	else
+	{
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				map.getView().setCenter(ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857'));
+			});
+
+		}	
+	}
+} else {
+   if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(function(position) {
+			map.getView().setCenter(ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857'));
+		});
+
+	}	
+}
+
+
+var pin_icon = 'https://cdn.rawgit.com/jonataswalker/ol3-contextmenu/master/examples/img/pin_drop.png';
+var center_icon = 'https://cdn.rawgit.com/jonataswalker/ol3-contextmenu/master/examples/img/center.png';
+var list_icon = 'https://cdn.rawgit.com/jonataswalker/ol3-contextmenu/master/examples/img/view_list.png';
+
+var contextmenu_items = [
+  {
+    text: 'Some Actions',
+    icon: list_icon,
+    items: [
+      {
+        text: 'Add a Marker',
+        icon: pin_icon,
+        callback: marker
+      }
+    ]
+  },
+  {
+    text: 'Add a Marker',
+    icon: pin_icon,
+    callback: marker
+  },
+  '-' // this is a separator
+];
+
+var contextmenu = new ContextMenu({
+  width: 180,
+  items: contextmenu_items
+});
+map.addControl(contextmenu);
+
+var removeMarkerItem = {
+  text: 'Remove this Marker',
+  classname: 'marker',
+  callback: removeMarker
+};
+
+contextmenu.on('open', function (evt) {
+  var feature =	map.forEachFeatureAtPixel(evt.pixel, ft => ft);
+  
+  if (feature && feature.get('type') === 'removable') {
+    contextmenu.clear();
+    removeMarkerItem.data = { marker: feature };
+    contextmenu.push(removeMarkerItem);
+  } else {
+    contextmenu.clear();
+    contextmenu.extend(contextmenu_items);
+    contextmenu.extend(contextmenu.getDefaultItems());
+  }
+});
+
+map.on('pointermove', function (e) {
+  
+  if (e.dragging) 
+  {
+		return;
+	}
+
+  if (typeof(Storage) !== "undefined") {
+	localStorage.position = map.getView().getCenter();
+	localStorage.zoom = map.getView().getZoom();
+  }
+
+  var pixel = map.getEventPixel(e.originalEvent);
+  var hit = map.hasFeatureAtPixel(pixel);
+  
+  map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+  
+});
+
+function removeMarker(obj) {
+  i = features.indexOf(obj.data.marker)
+  console.log(i)
+  vectorLayer.getSource().removeFeature(obj.data.marker);
+  if(i !== -1)
+  {
+	  points.splice(i, 1);
+	  features.splice(i, 1);
+  }
+  var totpoints = points.join(";");
+  	fetch(url_osrm_route + totpoints + "?source=first&overview=full&steps=true").then(function(r) { 
+      return r.json();
+    }).then(function(json) {
+      if(json.code !== 'Ok') {
+        return;
+      }
+      //points.length = 0;
+      utils.createRoute(json.trips[0].geometry);
+    });
+}
+
+function marker(obj) {
+    utils.getNearest(obj.coordinate).then(function(coord_street){
+    var last_point = points[points.length - 1];
+    var points_length = points.push(coord_street);
+
+    utils.createFeature(coord_street);
+
+    //get the route
+    var point1 = last_point.join();
+    var point2 = coord_street.join();
+    
+	var totpoints = points.join(";");
+
+	fetch(url_osrm_route + totpoints + "?source=first&overview=full&steps=true").then(function(r) { 
+      return r.json();
+    }).then(function(json) {
+      if(json.code !== 'Ok') {
+        return;
+      }
+      //points.length = 0;
+      utils.createRoute(json.trips[0].geometry);
+    });
+  });
+}
+
+var utils = {
+  getNearest: function(coord){
+    var coord4326 = utils.to4326(coord);    
+    return new Promise(function(resolve, reject) {
+      //make sure the coord is on street
+      fetch(url_osrm_nearest + coord4326.join()).then(function(response) { 
+        // Convert to JSON
+        return response.json();
+      }).then(function(json) {
+        if (json.code === 'Ok') resolve(json.waypoints[0].location);
+        else reject();
+      });
+    });
+  },
+  createFeature: function(coord) {
+	  var template = '({x} | {y})';
+      var iconStyle = new ol.style.Style({
+        image: new ol.style.Icon({ scale: .6, src: pin_icon }),
+        text: new ol.style.Text({
+          offsetY: 25,
+          text: ol.coordinate.format(coord, template, 2),
+          font: '15px Open Sans,sans-serif',
+          fill: new ol.style.Fill({ color: '#111' }),
+          stroke: new ol.style.Stroke({ color: '#eee', width: 2 })
+        })
+      });
+    var feature = new ol.Feature({
+      type: 'removable',
+      geometry: new ol.geom.Point(ol.proj.fromLonLat(coord))
+    });
+    feature.setStyle(iconStyle);
+	var dragInteraction = new ol.interaction.Modify({
+    features: new ol.Collection([feature]),
+    style: null
+	});
+	map.addInteraction(dragInteraction)
+	    feature.on('change',function(){
+    		    console.log('Feature Moved To:' + this.getGeometry().getCoordinates());
+    		},feature);
+	var div = document.createElement("div");
+	div.style.color = "black";
+	div.style.zIndex  = "1000";
+	div.style.float = "left";  
+	div.id = "bepbep"
+	div.innerHTML = ol.coordinate.format(coord, template, 2);
+	document.getElementById("bepbep").appendChild(div);
+	features.push(feature);
+    vectorSource.addFeature(feature);
+  },
+  createRoute: function(polyline) {
+    // route is ol.geom.LineString
+    var route = new ol.format.Polyline({
+      factor: 1e5
+    }).readGeometry(polyline, {
+      dataProjection: 'EPSG:4326',
+      featureProjection: 'EPSG:3857'
+    });
+    var feature = new ol.Feature({
+      type: 'route',
+      geometry: route
+    });
+    feature.setStyle(styles.route);
+	feature.setId('beep');
+	if(vectorSource.getFeatureById('beep') !== null)
+	{
+		vectorSource.removeFeature(vectorSource.getFeatureById('beep'));
+	}
+    vectorSource.addFeature(feature);
+	var savejson = JSON.stringify(points);
+	var http = new XMLHttpRequest();
+	var url = "saver.cgi";
+	var params = "SAVE=" + savejson;
+	http.open("POST", url, true);
+	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	http.send(params);
+  },
+  to4326: function(coord) {
+    return ol.proj.transform([
+      parseFloat(coord[0]), parseFloat(coord[1])
+    ], 'EPSG:3857', 'EPSG:4326');
+  }
+};
+
+    </script>
+
+  </body>
+</html>
