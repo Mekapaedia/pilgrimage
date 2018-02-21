@@ -15,6 +15,7 @@ var time = 0;
 var startup = false;
 var mode = 'trip';
 
+
 function getcoords(feature) {
 	return feature.getGeometry().getCoordinates();
 }
