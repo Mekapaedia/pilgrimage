@@ -9,4 +9,6 @@ then
 	echo "Content-Type: text/html"
 	echo ""
 	cat save-new.json
+else
+	echo ""
 fi

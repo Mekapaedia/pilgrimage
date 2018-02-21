@@ -1,6 +1,7 @@
 var url_osrm_nearest = 'https://mekapaedia.com:5001/nearest/v1/driving/';
 var url_osrm_route = 'https://mekapaedia.com:5001/route/v1/driving/';
 var url_osrm_trip = 'https://mekapaedia.com:5001/trip/v1/driving/';
+var url_osrm_matrix = 'https://mekapaedia.com:5001/table/v1/table/';
 var url_save = 'https://mekapaedia.com/router/saver-new.cgi';
 var url_get = 'https://mekapaedia.com/router/getter-new.cgi';
 
@@ -45,27 +46,36 @@ function jsonize_thinger() {
 	json_obj.start = new Object;
 	if (start != null) {
 		var start_coords = trans(getcoords(start), 4);
-		json_obj.start.coords = [start_coords[0], start_coords[1]];
+		json_obj.start.coordinate = [start_coords[0], start_coords[1]];
 	}
-	json_obj.routes = routes;
+	json_obj.routes = routes.json_obj();
 	json_obj.points = points.json_obj();
 	return JSON.stringify(json_obj);
 }
 
 function unjsonize_thinger(json_str) {
 	var json_obj = JSON.parse(json_str);
-	if (json_obj.start.coords != undefined) {
-		json_obj.start.coords = trans(json_obj.start.coords, 3);
-		start_obj = new Object;
-		start_obj.coordinate = json_obj.start.coords;
-		add_start_marker(start_obj);
+	if (json_obj.start.coordinate != undefined) {
+		json_obj.start.coordinate = trans(json_obj.start.coordinate, 3);
+		add_start_marker(json_obj.start);
 	}
 	for (var i = 0; i < json_obj.points.length; i++) {
-		json_obj.points[i].coords = trans(json_obj.points[i].coords, 3);
-		point_obj = new Object;
-		point_obj.coordinate = json_obj.points[i].coords;
-		add_marker(point_obj);
+		json_obj.points[i].coordinate = trans(json_obj.points[i].coordinate, 3);
+		add_marker(json_obj.points[i]);
 	}
+	mode = 'route';
+	for (var i = 0; i < json_obj.routes.length; i++) {
+		curr_route = new Array();
+		curr_route.name = json_obj.routes[i].name;
+		for(var j = 0; j < json_obj.routes[i].markers.length; j++)
+		{
+			json_obj.routes[i].markers[j].coordinate = trans(json_obj.routes[i].markers[j].coordinate, 3);
+			add_marker(json_obj.routes[i].markers[j]);
+		}
+		update_curr_route();
+		routes.push(curr_route);
+	}
+	mode = 'trip';
 }
 
 var save_state = function (json_str) {
@@ -95,13 +105,15 @@ var get_state = function () {
 
 get_state();
 
-var feature_list_test = []
-var start = null
-	var points = []
-	var routes = []
-	var trip = []
+var feature_list_test = [];
+var start = null;
+var points = [];
+var routes = [];
+var trip = [];
+var curr_route = null;
+var tsp_route = [];
 
-	feature_list_test.collapse = function (type) {
+feature_list_test.collapse = function (type) {
 	var temp_arr = [];
 	for (var i = 0; i < this.length; i++) {
 		temp_arr.push(getcoordstr(this[i]));
@@ -112,24 +124,54 @@ var start = null
 	return temp_arr.join(";");
 };
 
-points.collapse = function () {
+var arr_collapse = function (arr) {
 	var temp_arr = [];
-	for (var i = 0; i < this.length; i++) {
-		temp_arr.push(getcoordstr(this[i]));
+	for (var i = 0; i < arr.length; i++) {
+		temp_arr.push(getcoordstr(arr[i]));
 	}
 	return temp_arr.join(";");
+};
+
+points.collapse = function () {
+	return arr_collapse(this);
 }
 
-points.json_obj = function () {
+tsp_route.collapse = function () {
+	return arr_collapse(this);
+}
+
+var arr_json_obj = function (arr) {
 	var temp_arr = [];
-	for (var i = 0; i < this.length; i++) {
+	for (var i = 0; i < arr.length; i++) {
 		var point_obj = new Object;
-		point_obj.coords = trans(getcoords(this[i]), 4);
-		point_obj.label = this[i].getId();
-		point_obj.type = this[i].getProperties().marker_type;
+		point_obj.coordinate = trans(getcoords(arr[i]), 4);
+		point_obj.label = arr[i].getId();
+		point_obj.marker_type = arr[i].getProperties().marker_type;
+		point_obj.name = arr[i].getProperties().marker_name;
+		if(!point_obj.marker_type)
+		{
+			point_obj.marker_type = 'blank';
+		}
 		temp_arr.push(point_obj);
 	}
 	return temp_arr;
+
+};
+
+routes.json_obj = function () {
+	var temp_arr = [];
+	for(var i = 0; i < this.length; i++)
+	{
+		var route_obj = new Object;
+		route_obj.name = this[i].name;
+		route_obj.markers = arr_json_obj(this[i]);
+		temp_arr.push(route_obj);
+	}
+	return temp_arr;
+}
+
+points.json_obj = function () {
+	return arr_json_obj(this);
 }
 
 var marker_style = function (feature) {
@@ -246,52 +288,114 @@ var draw_route = function (polyline, route_type) {
 		];
 	}
 	feature.setStyle(trip_style);
+	if(route_type == 'route')
+	{
+		curr_route.route = feature;
+	}
 	vector_source.addFeature(feature);
 }
 
-var update_route = function () {
+var remove_trip_line = function () {
 	vector_source.getFeatures().forEach(function (ele) {
 		if (ele.getProperties()['feature_type'] == 'trip') {
 			vector_source.removeFeature(ele);
 		}
 	});
-	if (feature_list_test.length < 2) {
+};
+
+var remove_curr_route_line = function () {
+	if(curr_route.route) {
+		vector_source.removeFeature(curr_route.route);
+		curr_route.route = null;
+	}
+};
+
+var update_route = function () {
+	remove_trip_line();
+	if (feature_list_test.length < 2 || !getcoordstr(start) || getcoordstr(start) == '') {
 		return;
 	}
 
-	/*var url = url_osrm_route + feature_list_test.collapse() + "?overview=full&continue_straight=true";
-	var http = new XMLHttpRequest();
-	http.open("GET", url, true);
-	http.onreadystatechange = function () {
-	if (http.readyState == XMLHttpRequest.DONE) {
-	let json_res = JSON.parse(http.responseText);
-	if (json_res.code === "Ok") {
-	draw_route(json_res.routes[0].geometry);
+	if(routes.length < 1)
+	{	
+		var url = url_osrm_trip;
+		if (getcoordstr(start) != '') {
+			url = url + getcoordstr(start) + ";";
+		}
+		url = url + points.collapse() + "?overview=full";
+		var http = new XMLHttpRequest();
+		http.open("GET", url, true);
+		http.onreadystatechange = function () {
+			if (http.readyState == XMLHttpRequest.DONE) {
+				let json_res = JSON.parse(http.responseText);
+				if (json_res.code === "Ok") {
+					distance = json_res.trips[0].distance;
+					time = json_res.trips[0].duration;
+					draw_route(json_res.trips[0].geometry, 'trip');
+					save_state(jsonize_thinger());
+				}
+			}
+		}
+		http.send(null);
 	}
+	else
+	{
+		var url = url_osrm_matrix;
+        url = url + getcoordstr(start) + ";" + points.collapse();
+		for(var i = 0; i < routes.length; i++)
+		{
+			url = url + ";" + arr_collapse(routes[i]);
+		}
+        var http = new XMLHttpRequest();
+        http.open("GET", url, true);
+        http.onreadystatechange = function () {
+            if (http.readyState == XMLHttpRequest.DONE) {
+                let json_res = JSON.parse(http.responseText);
+                if (json_res.code === "Ok") {
+					tsp_solver(json_res.durations);
+					var url2 = url_osrm_route;
+					url2 = url2 + tsp_route.collapse() + "?overview=full";
+			        var http2 = new XMLHttpRequest();
+   			    	http2.open("GET", url2, true);
+        			http2.onreadystatechange = function () {
+		            	if (http2.readyState == XMLHttpRequest.DONE) {
+			                let json_res2 = JSON.parse(http2.responseText);
+			                if (json_res2.code === "Ok") {
+			                    distance = json_res2.routes[0].distance;
+			                    time = json_res2.routes[0].duration;
+			                    draw_route(json_res2.routes[0].geometry, 'trip');
+			                    save_state(jsonize_thinger());
+                			}
+            			}
+        			}
+			        http2.send(null);
+                }
+            }
+        }
+        http.send(null);		
 	}
-	}
-	http.send(null);*/
+};
 
-	var url = url_osrm_trip;
-	if (getcoordstr(start) != '') {
-		url = url + getcoordstr(start) + ";";
+var update_curr_route = function() {
+	remove_curr_route_line();
+	if (curr_route.length < 2) {
+		return;
 	}
-	url = url + points.collapse() + "?overview=full";
+
+	var url = url_osrm_route + arr_collapse(curr_route) + "?overview=full&continue_straight=true";
 	var http = new XMLHttpRequest();
 	http.open("GET", url, true);
 	http.onreadystatechange = function () {
 		if (http.readyState == XMLHttpRequest.DONE) {
 			let json_res = JSON.parse(http.responseText);
 			if (json_res.code === "Ok") {
-				distance = json_res.trips[0].distance;
-				time = json_res.trips[0].duration;
-				draw_route(json_res.trips[0].geometry, 'trip');
-				save_state(jsonize_thinger());
+				draw_route(json_res.routes[0].geometry, 'route');
+				curr_route.time = json_res.routes[0].duration;
 			}
 		}
 	}
 	http.send(null);
-}
+};
 
 var get_nearest = function (feature) {
 	coord = ol.proj.transform(feature.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326');
@@ -339,11 +443,27 @@ var add_marker = function (obj) {
 	drag_interaction.on('modifyend', function () {
 		get_nearest(this)
 	}, feature);
+
+	if(!obj.marker_type)
+	{
+		if(mode != 'route')
+		{
+			obj.marker_type = 'blank';
+		}
+		else
+		{
+			obj.marker_type = 'route';
+		}
+	}
+	if(!obj.name)
+	{
+		obj.name = "Unnamed";
+	}
 	feature.setProperties({
 		'interaction': drag_interaction,
 		'feature_type': 'marker',
-		'marker_type': 'blank',
-		'marker_name': 'Unnamed',
+		'marker_type': obj.marker_type,
+		'marker_name': obj.name,
 	});
 	map.addInteraction(drag_interaction);
 	get_nearest(feature);
@@ -358,17 +478,36 @@ var add_marker = function (obj) {
 			feature_list_test.unshift(feature);
 		} else {
 			feature_list_test.push(feature);
-			points.push(feature);
+			if(mode == 'trip')
+			{
+				points.push(feature);
+			}
+			else if(mode == 'route')
+			{
+				curr_route.push(feature);
+			}
 		}
 	} else {
 		feature.setId('pin ' + count);
 		feature_list_test.push(feature);
-		points.push(feature);
+		if(mode == 'trip')
+		{
+			points.push(feature);
+		}
+		else if(mode == 'route')
+		{
+			curr_route.push(feature);
+		}
 	}
 	count++;
 	vector_source.addFeature(feature);
-	if (startup != true) {
+	if(mode == 'trip' && !startup)
+	{
 		update_route();
+	}
+	else if(mode == 'route' && !startup)
+	{
+		update_curr_route();
 	}
 };
 
@@ -398,6 +537,14 @@ var delete_marker = function (obj) {
 
 var rename_marker = function (obj) {
 	var feature = map.getFeaturesAtPixel(map.getPixelFromCoordinate(obj.coordinate))[0];
+	var new_name = prompt("Enter a new name for the marker " + feature.getProperties().marker_name + ":");
+	if(new_name)
+	{
+		feature.setProperties({
+			'marker_name' : new_name
+		});
+	}
+	save_state(jsonize_thinger());
 };
 
 var poi_marker = function (obj) {
@@ -417,10 +564,19 @@ var routing_marker = function (obj) {
 };
 
 var add_route = function (obj) {
+	remove_trip_line();
+	curr_route = new Array();
+	curr_route.time = 0;
+	routes.push(curr_route);
 	mode = 'route';
 };
 
 var exit_route = function (obj) {
+	update_route();
+	if(curr_route.length < 1)
+	{
+		routes.splice(routes.indexOf(curr_route), 1);
+	}
 	mode = 'trip';
 };
 
@@ -505,3 +661,21 @@ contextmenu.on('beforeopen', function (evt) {
 		}
 	}
 });
+
+var tsp_solver = function(matrix) {
+	tsp_route.splice(0, tsp_route.length);
+	console.log(matrix);
+	tsp_route.push(start);
+	for(var i = 0; i < points.length; i++)
+	{
+		tsp_route.push(points[i]);
+	}	
+	for(var i = 0; i < routes.length; i++)
+	{
+		for(var j = 0; j < routes[i].length; j++)
+		{
+			tsp_route.push(routes[i][j]);
+		}
+	}
+	tsp_route.push(start);
+};
