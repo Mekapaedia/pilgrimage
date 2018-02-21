@@ -3161,3 +3161,435 @@ HTTP_ACCEPT_ENCODING=gzip, deflate, br
 CONTENT_TYPE=application/json;charset=UTF-8
 REQUEST_METHOD=POST
 _=/usr/bin/env
+Wed Feb 21 17:38:55 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:38:55 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:39:27 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:39:28 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:42:13 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:42:13 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:42:17 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:42:18 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:42:29 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:42:30 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:30 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:30 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:33 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=124
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:38 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:38 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:43 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=124
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:49 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
+Wed Feb 21 17:43:49 CET 2018
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36
+HTTP_HOST=mekapaedia.com
+SERVER_PORT=404
+SCRIPT_NAME=/router/saver-new.cgi
+REMOTE_USER=rkharvey
+AUTH_TYPE=Basic
+PATH=/usr/local/bin:/usr/ucb:/bin:/usr/bin
+PWD=/srv/shttp/mekapaedia.com/router
+HTTP_ACCEPT_LANGUAGE=en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7
+HTTP_REFERER=https://mekapaedia.com/router/newrouter.html
+HTTP_ACCEPT=*/*
+REMOTE_ADDR=127.0.0.1
+SHLVL=1
+SERVER_NAME=mekapaedia.com
+CONTENT_LENGTH=126
+SERVER_SOFTWARE=thttpd/2.27 April 3, 2012
+GATEWAY_INTERFACE=CGI/1.1
+CGI_PATTERN=**.cgi
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, br
+CONTENT_TYPE=application/json;charset=UTF-8
+REQUEST_METHOD=POST
+_=/usr/bin/env
