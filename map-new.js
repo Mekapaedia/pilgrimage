@@ -539,10 +539,5 @@ contextmenu.on('beforeopen', function (evt) {
 			contextmenu.extend(["-", context_delete_marker]);
 		}
 	}
-});ture.setProperties({
-        'interaction': drag_interaction,
-        'feature_type': 'marker',
-        'marker_type' : 'blank',
-        'marker_name' : 'Unnamed',
-    });
+});
 
