@@ -404,6 +404,7 @@ var poi_marker = function (obj) {
 	feature.setProperties({
 		'marker_type': 'poi'
 	});
+	save_state(jsonize_thinger());
 };
 
 var routing_marker = function (obj) {
@@ -411,6 +412,7 @@ var routing_marker = function (obj) {
 	feature.setProperties({
 		'marker_type': 'routing'
 	});
+	save_state(jsonize_thinger());
 };
 
 var add_route = function (obj) {
