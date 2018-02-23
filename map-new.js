@@ -15,6 +15,8 @@ var distance = 0;
 var time = 0;
 var startup = false;
 var mode = 'trip';
+var return_wait = false;
+var edits = 0;
 
 function getcoords(feature) {
 	return feature.getGeometry().getCoordinates();
@@ -64,16 +66,17 @@ function unjsonize_thinger(json_str) {
 	}
 	mode = 'route';
 	for (var i = 0; i < json_obj.routes.length; i++) {
-		curr_route = new Array();
+		routes.push([])
+		curr_route = routes[routes.length-1];
 		curr_route.name = json_obj.routes[i].name;
 		for (var j = 0; j < json_obj.routes[i].markers.length; j++) {
 			json_obj.routes[i].markers[j].coordinate = trans(json_obj.routes[i].markers[j].coordinate, 3);
 			add_marker(json_obj.routes[i].markers[j]);
 		}
 		update_curr_route();
-		routes.push(curr_route);
 	}
 	mode = 'trip';
+	update_route();
 }
 
 var save_state = function (json_str) {
@@ -81,13 +84,23 @@ var save_state = function (json_str) {
 	var url = url_save;
 	http.open("POST", url, true);
 	http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	console.log(json_str);
 	http.send(json_str);
 };
 
 var get_state = function () {
 	startup = true;
 	console.log("Loading...");
+	var images = []
+	images.push(new Image());
+	images[images.length-1].src = pin_blank;
+	images.push(new Image());
+	images[images.length-1].src = pin_start;
+ 	images.push(new Image());
+	images[images.length-1].src = pin_route;
+ 	images.push(new Image());
+	images[images.length-1].src = pin_poi;
+ 	images.push(new Image());
+	images[images.length-1].src = pin_routing;
 	var http = new XMLHttpRequest();
 	var url = url_get + "?please=yes";
 	http.open("GET", url, true);
@@ -160,6 +173,10 @@ routes.json_obj = function () {
 	for (var i = 0; i < this.length; i++) {
 		var route_obj = new Object;
 		route_obj.name = this[i].name;
+		if(!route_obj.name)
+		{
+			route_obj.name = "Unnamed";
+		}
 		route_obj.markers = arr_json_obj(this[i]);
 		temp_arr.push(route_obj);
 	}
@@ -230,7 +247,6 @@ map.on('pointermove', function (e) {
 	if (e.dragging) {
 		return;
 	}
-
 	var pixel = map.getEventPixel(e.originalEvent);
 	var hit = map.hasFeatureAtPixel(pixel);
 
@@ -242,7 +258,7 @@ map.on('pointermove', function (e) {
 
 });
 
-var draw_route = function (polyline, route_type) {
+var draw_route = function (polyline, route_type, specific_route) {
 	var route = new ol.format.Polyline({
 			factor: 1e5
 		}).readGeometry(polyline, {
@@ -283,9 +299,16 @@ var draw_route = function (polyline, route_type) {
 			})
 		];
 	}
+	if(!specific_route)
+	{
+		specific_route = curr_route
+	}
 	feature.setStyle(trip_style);
 	if (route_type == 'route') {
-		curr_route.route = feature;
+		feature.setProperties({
+			'parent_route' : specific_route
+		});
+		specific_route.route = feature;
 	}
 	vector_source.addFeature(feature);
 }
@@ -300,7 +323,11 @@ var remove_trip_line = function () {
 
 var remove_curr_route_line = function () {
 	if (curr_route.route) {
-		vector_source.removeFeature(curr_route.route);
+		vector_source.getFeatures().forEach(function (ele) {
+			if (ele.getProperties()['feature_type'] == 'route' && ele.getProperties().parent_route == curr_route) {
+				vector_source.removeFeature(ele);
+			}
+		});
 		curr_route.route = null;
 	}
 };
@@ -318,7 +345,8 @@ var update_route = function () {
 		}
 		url = url + points.collapse() + "?overview=full";
 		var http = new XMLHttpRequest();
-		http.open("GET", url, true);
+		var async = true;
+		http.open("GET", url, async);
 		http.onreadystatechange = function () {
 			if (http.readyState == XMLHttpRequest.DONE) {
 				let json_res = JSON.parse(http.responseText);
@@ -327,6 +355,7 @@ var update_route = function () {
 					time = json_res.trips[0].duration;
 					draw_route(json_res.trips[0].geometry, 'trip');
 					save_state(jsonize_thinger());
+					edits--;
 				}
 			}
 		}
@@ -335,10 +364,11 @@ var update_route = function () {
 		var url = url_osrm_matrix;
 		url = url + getcoordstr(start) + ";" + points.collapse();
 		for (var i = 0; i < routes.length; i++) {
-			url = url + ";" + arr_collapse(routes[i]);
+			url = url + ";" + getcoordstr(routes[i][0]) + ";" + getcoordstr(routes[i][routes[i].length-1]);
 		}
 		var http = new XMLHttpRequest();
-		http.open("GET", url, true);
+		var async = true;
+		http.open("GET", url, async);
 		http.onreadystatechange = function () {
 			if (http.readyState == XMLHttpRequest.DONE) {
 				let json_res = JSON.parse(http.responseText);
@@ -347,7 +377,8 @@ var update_route = function () {
 					var url2 = url_osrm_route;
 					url2 = url2 + tsp_route.collapse() + "?overview=full";
 					var http2 = new XMLHttpRequest();
-					http2.open("GET", url2, true);
+					async = true;
+					http2.open("GET", url2, async);
 					http2.onreadystatechange = function () {
 						if (http2.readyState == XMLHttpRequest.DONE) {
 							let json_res2 = JSON.parse(http2.responseText);
@@ -356,6 +387,15 @@ var update_route = function () {
 								time = json_res2.routes[0].duration;
 								draw_route(json_res2.routes[0].geometry, 'trip');
 								save_state(jsonize_thinger());
+								if(edits > 0)
+								{
+									edits--;
+								}
+								console.log(edits);
+								if(edits > 0)
+								{
+									update_route();
+								}
 							}
 						}
 					}
@@ -375,13 +415,15 @@ var update_curr_route = function () {
 
 	var url = url_osrm_route + arr_collapse(curr_route) + "?overview=full&continue_straight=true";
 	var http = new XMLHttpRequest();
-	http.open("GET", url, true);
+	var async = true;
+	var my_curr_route = curr_route;
+	http.open("GET", url, async);
 	http.onreadystatechange = function () {
 		if (http.readyState == XMLHttpRequest.DONE) {
 			let json_res = JSON.parse(http.responseText);
 			if (json_res.code === "Ok") {
-				draw_route(json_res.routes[0].geometry, 'route');
-				curr_route.time = json_res.routes[0].duration;
+				draw_route(json_res.routes[0].geometry, 'route', my_curr_route);
+				my_curr_route.time = json_res.routes[0].duration;
 			}
 		}
 	}
@@ -393,13 +435,32 @@ var get_nearest = function (feature) {
 	var coordstring = coord.join(',');
 	var http = new XMLHttpRequest();
 	var url = url_osrm_nearest + coordstring;
-	http.open("GET", url, true);
+	var async = true;
+	var in_startup = startup;
+	http.open("GET", url, async);
 	http.onreadystatechange = function () {
 		if (http.readyState == XMLHttpRequest.DONE) {
 			let json_res = JSON.parse(http.responseText);
 			if (json_res.code === "Ok") {
 				feature.setGeometry(new ol.geom.Point(ol.proj.fromLonLat(json_res.waypoints[0].location)));
-				update_route();
+				if(!in_startup)
+				{
+					if(mode == 'trip')
+					{	
+						if(feature.getProperties().marker_type == 'route')
+						{
+							mode = 'route';
+							curr_route = feature.getProperties().parent_route;
+							update_curr_route();
+							mode = 'trip';
+						}
+						update_route();
+					}
+					else if (mode == 'route')
+					{
+						update_curr_route();
+					}
+				}
 			}
 		}
 	}
@@ -417,7 +478,6 @@ var add_start_marker = function (obj) {
 	obj.marker_label = 'start';
 	obj.is_start = 'yeah';
 	add_marker(obj);
-	console.log(start);
 };
 
 var add_marker = function (obj) {
@@ -467,6 +527,9 @@ var add_marker = function (obj) {
 			if (mode == 'trip') {
 				points.push(feature);
 			} else if (mode == 'route') {
+				feature.setProperties({
+					'parent_route' : curr_route
+				});
 				curr_route.push(feature);
 			}
 		}
@@ -476,6 +539,9 @@ var add_marker = function (obj) {
 		if (mode == 'trip') {
 			points.push(feature);
 		} else if (mode == 'route') {
+			feature.setProperties({
+				'parent_route' : curr_route
+			});
 			curr_route.push(feature);
 		}
 	}
@@ -488,10 +554,6 @@ var add_marker = function (obj) {
 	}
 };
 
-function seejson() {
-	console.log(feature_list_test.serialise());
-}
-
 var contextmenu = new ContextMenu({
 		width: 170,
 		defaultItems: false,
@@ -503,18 +565,60 @@ var delete_marker = function (obj) {
 	var feature = map.getFeaturesAtPixel(map.getPixelFromCoordinate(obj.coordinate))[0];
 	feature_list_test.splice(feature_list_test.indexOf(feature), 1);
 	if (feature.getProperties().is_start != 'yeah') {
-		points.splice(points.indexOf(feature), 1);
+		if(feature.getProperties().parent_route && mode == 'trip')
+		{
+			mode = 'route';
+			curr_route = feature.getProperties().parent_route;
+			curr_route.splice(curr_route.indexOf(feature), 1);
+			if(curr_route.length < 1)
+			{
+				routes.splice(routes.indexOf(curr_route), 1);
+				update_curr_route();
+				curr_route = null;
+			}
+			else
+			{
+				update_curr_route();
+			}
+			mode = 'trip';
+		}
+		else if(mode == 'route')
+		{
+			curr_route.splice(curr_route.indexOf(feature), 1);
+			if(curr_route.length < 1)
+			{
+				routes.splice(routes.indexOf(curr_route), 1);
+				update_curr_route();
+				exit_route();
+			}
+			else
+			{
+				update_curr_route();
+			}
+		}
+		else
+		{
+			points.splice(points.indexOf(feature), 1);
+		}
 	} else {
 		start = null;
 	}
 	map.removeInteraction(feature.getProperties()['interaction']);
 	vector_source.removeFeature(feature);
-	update_route();
+	if(mode == 'trip')
+	{
+		update_route();
+		edits++;
+	}
 };
 
 var rename_marker = function (obj) {
 	var feature = map.getFeaturesAtPixel(map.getPixelFromCoordinate(obj.coordinate))[0];
-	var new_name = prompt("Enter a new name for the marker " + feature.getProperties().marker_name + ":");
+	if(feature.getId() == 'start')
+	{
+		return;
+	}
+	var new_name = prompt("Enter a new name for the marker " + feature.getProperties().marker_name + ":", feature.getProperties().marker_name);
 	if (new_name) {
 		feature.setProperties({
 			'marker_name': new_name
@@ -541,18 +645,93 @@ var routing_marker = function (obj) {
 
 var add_route = function (obj) {
 	remove_trip_line();
-	curr_route = new Array();
+	routes.push([]);
+	curr_route = routes[routes.length-1];
 	curr_route.time = 0;
-	routes.push(curr_route);
+	curr_route.name = "Unnamed";
 	mode = 'route';
 };
 
 var exit_route = function (obj) {
 	update_route();
-	if (curr_route.length < 1) {
+	if (curr_route.length < 1 && curr_route != null) {
 		routes.splice(routes.indexOf(curr_route), 1);
 	}
 	mode = 'trip';
+};
+
+var edit_route = function (obj) {
+	remove_trip_line();
+	mode = 'route';
+	var features = map.getFeaturesAtPixel(map.getPixelFromCoordinate(obj.coordinate));
+	for(var i = 0; i < features.length; i++)
+	{
+		if(features[i].getProperties().parent_route)
+		{
+			curr_route = features[i].getProperties().parent_route;
+			break;
+		}
+	}
+};
+
+var rename_route = function (obj) {
+	var old_curr_route = curr_route;
+	var features = map.getFeaturesAtPixel(map.getPixelFromCoordinate(obj.coordinate));
+	for(var i = 0; i < features.length; i++)
+	{
+		if(features[i].getProperties().parent_route)
+		{
+			curr_route = features[i].getProperties().parent_route;
+			break;
+		}
+	}
+	var new_name = prompt("Enter a new name for the route " + curr_route.name + ":", curr_route.name);
+	if (new_name) {
+		curr_route.name = new_name;
+	}
+	curr_route = old_curr_route;
+	save_state(jsonize_thinger());
+};
+
+var delete_route = function (obj) {
+	var old_curr_route = curr_route;
+	var deleting_self = false;
+	var old_mode = mode;
+	var features = map.getFeaturesAtPixel(map.getPixelFromCoordinate(obj.coordinate));
+	for(var i = 0; i < features.length; i++)
+	{
+		if(features[i].getProperties().parent_route)
+		{
+			curr_route = features[i].getProperties().parent_route;
+			break;
+		}
+	}
+	if(old_curr_route == curr_route)
+	{
+		deleting_self = true;
+	}
+	remove_curr_route_line();
+	for(var i = 0; i < curr_route.length; i++)
+	{
+		map.removeInteraction(curr_route[i].getProperties()['interaction']);
+		vector_source.removeFeature(curr_route[i]);
+	}
+	routes.splice(routes.indexOf(curr_route), 1);
+	curr_route = null;
+	mode = old_mode;
+	if(!deleting_self)
+	{
+		curr_route = old_curr_route;
+	}
+	else if(deleting_self && mode == 'route')
+	{
+		mode = 'trip';	
+	}
+	if(mode == 'trip')
+	{
+		update_route();
+	}
+	save_state(jsonize_thinger());
 };
 
 var context_delete_marker = {
@@ -573,10 +752,22 @@ var context_add_route = {
 	callback: add_route
 };
 
+var context_delete_route = {
+	text: "Delete route",
+	icon: "delete_32.png",
+	callback: delete_route
+};
+
 var context_exit_route = {
 	text: "Return to trip",
 	icon: "exit_32.png",
 	callback: exit_route
+};
+
+var context_edit_route = {
+	text: "Edit route",
+	icon: "edit_32.png",
+	callback: edit_route
 };
 
 var context_add_start_marker = {
@@ -610,10 +801,45 @@ var context_add = {
 	items: [context_add_marker, context_add_route]
 };
 
+
+
 contextmenu.on('beforeopen', function (evt) {
-	var feature = map.forEachFeatureAtPixel(evt.pixel, function (ft, l) {
-			return ft;
-		});
+	var features = [];
+	var feature = null;
+	map.forEachFeatureAtPixel(evt.pixel, function (ft, l) {
+			features.push(ft);
+	});
+	console.log(features);
+	if(features.length == 1)
+	{
+		feature = features[0];
+	}
+	else if(features.length > 1)
+	{
+		for(var i = 0; i < features.length; i++)
+		{
+			if(features[i].getProperties().feature_type == 'marker')
+			{
+				feature = features[i];
+				break;
+			}
+		}
+		if(!feature)
+		{
+			for(var i = 0; i < features.length; i++)
+			{
+				if(features[i].getProperties().parent_route)
+				{
+					feature = features[i];
+					break;
+				}
+			}
+		}
+		if(!feature)
+		{
+			feature = features[features.length - 1];		
+		}
+	}
 	contextmenu.clear();
 	if (mode == 'trip') {
 		contextmenu.extend([context_add, context_set]);
@@ -621,18 +847,44 @@ contextmenu.on('beforeopen', function (evt) {
 		contextmenu.extend([context_add_marker, context_exit_route]);
 	}
 	if (feature) {
-		if (feature.getProperties()['feature_type'] == 'marker') {
+		if(feature.getProperties().parent_route || feature.getProperties()['feature_type'] == 'marker')
+		{
 			contextmenu.clear();
-			var feature_name = feature.getProperties().marker_name;
-			var context_rename = {
-				text: feature_name,
-				callback: rename_marker
-			};
-			contextmenu.extend([context_rename]);
-			if (feature.getId() != "start") {
-				contextmenu.extend([context_change_type]);
+			if (feature.getProperties()['feature_type'] == 'marker') {
+				var feature_name = feature.getProperties().marker_name;
+				var context_rename = {
+					text: feature_name,
+					callback: rename_marker
+				};
+				contextmenu.extend([context_rename]);
+				if (feature.getId() != "start" && feature.getProperties().marker_type != 'route') {
+					contextmenu.extend([context_change_type]);
+				}
 			}
-			contextmenu.extend(["-", context_delete_marker]);
+			if(feature.getProperties().parent_route)
+			{
+				if(feature.getProperties().feature_type == 'marker')
+				{
+					contextmenu.extend(['-']);
+				}
+				var route_name = feature.getProperties().parent_route.name;
+				var context_rename_route = {
+					text: route_name,
+					callback: rename_route
+				};
+				contextmenu.extend([context_rename_route, context_edit_route])
+				if(feature.getProperties().feature_type == 'route')
+				{
+					contextmenu.extend(['-']);
+				}
+			}
+			if (feature.getProperties()['feature_type'] == 'marker') {
+				contextmenu.extend(["-", context_delete_marker]);
+			}
+			if(feature.getProperties().parent_route)
+			{
+				contextmenu.extend([context_delete_route]);
+			}
 		}
 	}
 });
