@@ -339,8 +339,7 @@ var update_route = function () {
 	}
 	var url = url_osrm_matrix;
 	url = url + getcoordstr(start);
-	if(points.length > 0)
-	{
+	if (points.length > 0) {
 		url = url + ";" + points.collapse();
 	}
 	for (var i = 0; i < routes.length; i++) {
@@ -835,161 +834,125 @@ var tsp_solver = function (matrix) {
 	var tsp_order = [];
 	var tsp_unordered = [];
 
-	for(var i = 1; i < matrix[0].length; i++)
-	{
+	for (var i = 1; i < matrix[0].length; i++) {
 		tsp_unordered.push(i);
 	}
 	tsp_order.push(0);
-	while(tsp_unordered.length > 0)
-	{
+	while (tsp_unordered.length > 0) {
 		var marker_dist = 0;
 		var marker = -1;
-		for(var i = 0; i < tsp_order.length; i++)
-		{
-			for(var j = 0; j < tsp_unordered.length; j++)
-			{
+		for (var i = 0; i < tsp_order.length; i++) {
+			for (var j = 0; j < tsp_unordered.length; j++) {
 				var curr_marker = tsp_unordered[j];
 				var curr_dist = matrix[tsp_order[i]][curr_marker];
-				if(curr_dist > marker_dist)
-				{
+				if (curr_dist > marker_dist) {
 					marker_dist = curr_dist;
 					marker = curr_marker
 				}
 			}
 		}
-		if(tsp_order.length == 1)
-		{
+		if (tsp_order.length == 1) {
 			tsp_order.push(marker);
 			tsp_unordered.splice(tsp_unordered.indexOf(marker), 1);
-			if(marker > points.length)
-			{
-				if(route_dir(marker) == 0)
-				{
+			if (marker > points.length) {
+				if (route_dir(marker) == 0) {
 					tsp_order.push(marker + 1);
 					tsp_unordered.splice(tsp_unordered.indexOf(marker + 1), 1);
-				}
-				else
-				{
+				} else {
 					tsp_order.push(marker - 1);
 					tsp_unordered.splice(tsp_unordered.indexOf(marker - 1), 1);
 
 				}
 			}
 			tsp_order.push(0);
-		}
-		else
-		{
+		} else {
 			var tour_dist = Number.MAX_SAFE_INTEGER;
 			var pre = -1;
 			var post = -1;
-			for(var i = 0; i < tsp_order.length - 1; i++)
-			{
-				if(i > 0 && tsp_order[i] > points.length && Math.abs(tsp_order[i+1] - tsp_order[i]) == 1)
-				{
+			for (var i = 0; i < tsp_order.length - 1; i++) {
+				if (i > 0 && tsp_order[i] > points.length && Math.abs(tsp_order[i + 1] - tsp_order[i]) == 1) {
 					continue;
 				}
-				var pre_post_dist = matrix[tsp_order[i]][tsp_order[i+1]];
+				var pre_post_dist = matrix[tsp_order[i]][tsp_order[i + 1]];
 				var pre_dist = matrix[tsp_order[i]][marker];
-				var post_dist = matrix[marker][tsp_order[i+1]];
-				if(marker > points.length)
-				{
-					if(route_dir(marker) == 0)
-					{
-						post_dist = matrix[marker + 1][tsp_order[i+1]];
-					}
-					else
-					{
-						post_dist = matrix[marker - 1][tsp_order[i+1]];
+				var post_dist = matrix[marker][tsp_order[i + 1]];
+				if (marker > points.length) {
+					if (route_dir(marker) == 0) {
+						post_dist = matrix[marker + 1][tsp_order[i + 1]];
+					} else {
+						post_dist = matrix[marker - 1][tsp_order[i + 1]];
 					}
 					var route_time = routes[route_pos(marker)].time;
-					if(!route_time)
-					{
+					if (!route_time) {
 						route_time = 0;
 					}
 					post_dist += route_time;
 				}
 				var curr_dist = pre_dist + post_dist - pre_post_dist;
-				if(curr_dist < tour_dist)
-				{
+				if (curr_dist < tour_dist) {
 					tour_dist = curr_dist;
 					pre = tsp_order[i];
-					post = tsp_order[i+1];
+					post = tsp_order[i + 1];
 				}
 			}
 			tsp_order.splice(tsp_order.indexOf(pre) + 1, 0, marker);
 			tsp_unordered.splice(tsp_unordered.indexOf(marker), 1);
-			if(marker > points.length && routes[route_pos(marker)].length > 1)
-			{
-				if(route_dir(marker) == 0)
-				{
+			if (marker > points.length && routes[route_pos(marker)].length > 1) {
+				if (route_dir(marker) == 0) {
 					tsp_order.splice(tsp_order.indexOf(marker) + 1, 0, marker + 1);
 					tsp_unordered.splice(tsp_unordered.indexOf(marker + 1), 1);
-				}
-				else
-				{
+				} else {
 					tsp_order.splice(tsp_order.indexOf(marker) + 1, 0, marker - 1);
 					tsp_unordered.splice(tsp_unordered.indexOf(marker - 1), 1);
 				}
 			}
 		}
 	}
-	for(var i = 1; i < tsp_order.length - 1; i++)
-	{
-		if(tsp_order[i] > points.length && routes[route_pos(tsp_order[i])].length > 1)
-		{
-			var pre_dist = matrix[tsp_order[i-1]][tsp_order[i]];
-			var post_dist = matrix[tsp_order[i+1]][tsp_order[i+2]];
-			var swap_pre_dist = matrix[tsp_order[i-1]][tsp_order[i+1]];
-			var swap_post_dist = matrix[tsp_order[i]][tsp_order[i+2]];
+	for (var i = 1; i < tsp_order.length - 1; i++) {
+		if (tsp_order[i] > points.length && routes[route_pos(tsp_order[i])].length > 1) {
+			var pre_dist = matrix[tsp_order[i - 1]][tsp_order[i]];
+			var post_dist = matrix[tsp_order[i + 1]][tsp_order[i + 2]];
+			var swap_pre_dist = matrix[tsp_order[i - 1]][tsp_order[i + 1]];
+			var swap_post_dist = matrix[tsp_order[i]][tsp_order[i + 2]];
 			var dist = pre_dist + post_dist;
 			var swap_dist = swap_pre_dist + swap_post_dist;
-			if(swap_dist < dist)
-			{
-				var temp = tsp_order[i+1];
-				tsp_order[i+1] = tsp_order[i];
-				tsp_order[i] = temp;	
+			if (swap_dist < dist) {
+				var temp = tsp_order[i + 1];
+				tsp_order[i + 1] = tsp_order[i];
+				tsp_order[i] = temp;
 			}
 			i++;
 		}
 	}
 	tsp_route.push(start);
-	for(var i = 1; i < tsp_order.length - 1; i++)
-	{
-		if(tsp_order[i] <= points.length)
-		{
+	for (var i = 1; i < tsp_order.length - 1; i++) {
+		if (tsp_order[i] <= points.length) {
 			tsp_route.push(points[tsp_order[i] - 1]);
-		}
-		else
-		{
+		} else {
 			var route_arr = routes[route_pos(tsp_order[i])];
-			if(route_dir(tsp_order[i]) == 1)
-			{
+			if (route_dir(tsp_order[i]) == 1) {
 				route_arr.reverse();
 			}
-			for(var j = 0; j < route_arr.length; j++)
-			{
+			for (var j = 0; j < route_arr.length; j++) {
 				tsp_route.push(route_arr[j]);
 			}
 			i++;
 		}
 	}
-	for(var i = 1; i < tsp_route.length; i++)
-	{
+	for (var i = 1; i < tsp_route.length; i++) {
 		tsp_route[i].setId(i.toString());
-	} 
+	}
 	tsp_route.push(start);
 };
 
-var print_arr = function(arr) {
+var print_arr = function (arr) {
 	var str = "["
-	for(var i = 0; i < arr.length; i++)
-	{
-		str += arr[i];
-		if(i < arr.length-1)
-		{
-			str += ', ';
+		for (var i = 0; i < arr.length; i++) {
+			str += arr[i];
+			if (i < arr.length - 1) {
+				str += ', ';
+			}
 		}
-	}
-	str += ']';
+		str += ']';
 	console.log(str)
 };
