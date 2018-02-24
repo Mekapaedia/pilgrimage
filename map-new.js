@@ -205,13 +205,13 @@ var marker_style = function (feature) {
 				anchor: [.5, 1],
 			}),
 			text: new ol.style.Text({
-				font: '11px Arial,sans-serif',
+				font: '12px Arial,sans-serif',
 				fill: new ol.style.Fill({
 					color: '#000'
 				}),
 				stroke: new ol.style.Stroke({
-					color: '#fff',
-					width: 1
+					color: '#ddd',
+					width: 2
 				}),
 				text: icon_text
 			})
@@ -244,6 +244,7 @@ var map = new ol.Map({
 map.on('pointermove', function (e) {
 
 	if (e.dragging) {
+		map.getTargetElement().style.cursor = '-webkit-grabbing';
 		return;
 	}
 	var pixel = map.getEventPixel(e.originalEvent);
@@ -332,75 +333,54 @@ var remove_curr_route_line = function () {
 
 var update_route = function () {
 	remove_trip_line();
-	if (feature_list_test.length < 2 || !getcoordstr(start) || getcoordstr(start) == '') {
+	if (points.length + routes.length < 1 || !getcoordstr(start) || getcoordstr(start) == '') {
+		save_state(jsonize_thinger());
 		return;
 	}
-
-	if (routes.length < 1) {
-		var url = url_osrm_trip;
-		if (getcoordstr(start) != '') {
-			url = url + getcoordstr(start) + ";";
-		}
-		url = url + points.collapse() + "?overview=full";
-		var http = new XMLHttpRequest();
-		var async = true;
-		http.open("GET", url, async);
-		http.onreadystatechange = function () {
-			if (http.readyState == XMLHttpRequest.DONE) {
-				let json_res = JSON.parse(http.responseText);
-				if (json_res.code === "Ok") {
-					distance = json_res.trips[0].distance;
-					time = json_res.trips[0].duration;
-					draw_route(json_res.trips[0].geometry, 'trip');
-					save_state(jsonize_thinger());
-					edits--;
-				}
-			}
-		}
-		http.send(null);
-	} else {
-		var url = url_osrm_matrix;
-		url = url + getcoordstr(start) + ";" + points.collapse();
-		for (var i = 0; i < routes.length; i++) {
-			url = url + ";" + getcoordstr(routes[i][0]) + ";" + getcoordstr(routes[i][routes[i].length - 1]);
-		}
-		var http = new XMLHttpRequest();
-		var async = true;
-		http.open("GET", url, async);
-		http.onreadystatechange = function () {
-			if (http.readyState == XMLHttpRequest.DONE) {
-				let json_res = JSON.parse(http.responseText);
-				if (json_res.code === "Ok") {
-					tsp_solver(json_res.durations);
-					var url2 = url_osrm_route;
-					url2 = url2 + tsp_route.collapse() + "?overview=full";
-					var http2 = new XMLHttpRequest();
-					async = true;
-					http2.open("GET", url2, async);
-					http2.onreadystatechange = function () {
-						if (http2.readyState == XMLHttpRequest.DONE) {
-							let json_res2 = JSON.parse(http2.responseText);
-							if (json_res2.code === "Ok") {
-								distance = json_res2.routes[0].distance;
-								time = json_res2.routes[0].duration;
-								draw_route(json_res2.routes[0].geometry, 'trip');
-								save_state(jsonize_thinger());
-								if (edits > 0) {
-									edits--;
-								}
-								console.log(edits);
-								if (edits > 0) {
-									update_route();
-								}
+	var url = url_osrm_matrix;
+	url = url + getcoordstr(start);
+	if(points.length > 0)
+	{
+		url = url + ";" + points.collapse();
+	}
+	for (var i = 0; i < routes.length; i++) {
+		url = url + ";" + getcoordstr(routes[i][0]) + ";" + getcoordstr(routes[i][routes[i].length - 1]);
+	}
+	var http = new XMLHttpRequest();
+	var async = true;
+	http.open("GET", url, async);
+	http.onreadystatechange = function () {
+		if (http.readyState == XMLHttpRequest.DONE) {
+			let json_res = JSON.parse(http.responseText);
+			if (json_res.code === "Ok") {
+				tsp_solver(json_res.durations);
+				var url2 = url_osrm_route;
+				url2 = url2 + tsp_route.collapse() + "?overview=full&continue_straight=true";
+				var http2 = new XMLHttpRequest();
+				async = true;
+				http2.open("GET", url2, async);
+				http2.onreadystatechange = function () {
+					if (http2.readyState == XMLHttpRequest.DONE) {
+						let json_res2 = JSON.parse(http2.responseText);
+						if (json_res2.code === "Ok") {
+							distance = json_res2.routes[0].distance;
+							time = json_res2.routes[0].duration;
+							draw_route(json_res2.routes[0].geometry, 'trip');
+							save_state(jsonize_thinger());
+							if (edits > 0) {
+								edits--;
+							}
+							if (edits > 0) {
+								update_route();
 							}
 						}
 					}
-					http2.send(null);
 				}
+				http2.send(null);
 			}
 		}
-		http.send(null);
 	}
+	http.send(null);
 };
 
 var update_curr_route = function () {
@@ -773,7 +753,6 @@ contextmenu.on('beforeopen', function (evt) {
 	map.forEachFeatureAtPixel(evt.pixel, function (ft, l) {
 		features.push(ft);
 	});
-	console.log(features);
 	if (features.length == 1) {
 		feature = features[0];
 	} else if (features.length > 1) {
@@ -839,17 +818,178 @@ contextmenu.on('beforeopen', function (evt) {
 	}
 });
 
+var route_dir = function (ele) {
+	return route_zone(ele) % 2;
+};
+
+var route_pos = function (ele) {
+	return parseInt(route_zone(ele) / 2, 10);
+};
+
+var route_zone = function (ele) {
+	return (ele - points.length - 1);
+};
+
 var tsp_solver = function (matrix) {
 	tsp_route.splice(0, tsp_route.length);
-	console.log(matrix);
-	tsp_route.push(start);
-	for (var i = 0; i < points.length; i++) {
-		tsp_route.push(points[i]);
+	var tsp_order = [];
+	var tsp_unordered = [];
+
+	for(var i = 1; i < matrix[0].length; i++)
+	{
+		tsp_unordered.push(i);
 	}
-	for (var i = 0; i < routes.length; i++) {
-		for (var j = 0; j < routes[i].length; j++) {
-			tsp_route.push(routes[i][j]);
+	tsp_order.push(0);
+	while(tsp_unordered.length > 0)
+	{
+		var marker_dist = 0;
+		var marker = -1;
+		for(var i = 0; i < tsp_order.length; i++)
+		{
+			for(var j = 0; j < tsp_unordered.length; j++)
+			{
+				var curr_marker = tsp_unordered[j];
+				var curr_dist = matrix[tsp_order[i]][curr_marker];
+				if(curr_dist > marker_dist)
+				{
+					marker_dist = curr_dist;
+					marker = curr_marker
+				}
+			}
+		}
+		if(tsp_order.length == 1)
+		{
+			tsp_order.push(marker);
+			tsp_unordered.splice(tsp_unordered.indexOf(marker), 1);
+			if(marker > points.length)
+			{
+				if(route_dir(marker) == 0)
+				{
+					tsp_order.push(marker + 1);
+					tsp_unordered.splice(tsp_unordered.indexOf(marker + 1), 1);
+				}
+				else
+				{
+					tsp_order.push(marker - 1);
+					tsp_unordered.splice(tsp_unordered.indexOf(marker - 1), 1);
+
+				}
+			}
+			tsp_order.push(0);
+		}
+		else
+		{
+			var tour_dist = Number.MAX_SAFE_INTEGER;
+			var pre = -1;
+			var post = -1;
+			for(var i = 0; i < tsp_order.length - 1; i++)
+			{
+				if(i > 0 && tsp_order[i] > points.length && Math.abs(tsp_order[i+1] - tsp_order[i]) == 1)
+				{
+					continue;
+				}
+				var pre_post_dist = matrix[tsp_order[i]][tsp_order[i+1]];
+				var pre_dist = matrix[tsp_order[i]][marker];
+				var post_dist = matrix[marker][tsp_order[i+1]];
+				if(marker > points.length)
+				{
+					if(route_dir(marker) == 0)
+					{
+						post_dist = matrix[marker + 1][tsp_order[i+1]];
+					}
+					else
+					{
+						post_dist = matrix[marker - 1][tsp_order[i+1]];
+					}
+					var route_time = routes[route_pos(marker)].time;
+					if(!route_time)
+					{
+						route_time = 0;
+					}
+					post_dist += route_time;
+				}
+				var curr_dist = pre_dist + post_dist - pre_post_dist;
+				if(curr_dist < tour_dist)
+				{
+					tour_dist = curr_dist;
+					pre = tsp_order[i];
+					post = tsp_order[i+1];
+				}
+			}
+			tsp_order.splice(tsp_order.indexOf(pre) + 1, 0, marker);
+			tsp_unordered.splice(tsp_unordered.indexOf(marker), 1);
+			if(marker > points.length && routes[route_pos(marker)].length > 1)
+			{
+				if(route_dir(marker) == 0)
+				{
+					tsp_order.splice(tsp_order.indexOf(marker) + 1, 0, marker + 1);
+					tsp_unordered.splice(tsp_unordered.indexOf(marker + 1), 1);
+				}
+				else
+				{
+					tsp_order.splice(tsp_order.indexOf(marker) + 1, 0, marker - 1);
+					tsp_unordered.splice(tsp_unordered.indexOf(marker - 1), 1);
+				}
+			}
+		}
+	}
+	for(var i = 1; i < tsp_order.length - 1; i++)
+	{
+		if(tsp_order[i] > points.length && routes[route_pos(tsp_order[i])].length > 1)
+		{
+			var pre_dist = matrix[tsp_order[i-1]][tsp_order[i]];
+			var post_dist = matrix[tsp_order[i+1]][tsp_order[i+2]];
+			var swap_pre_dist = matrix[tsp_order[i-1]][tsp_order[i+1]];
+			var swap_post_dist = matrix[tsp_order[i]][tsp_order[i+2]];
+			var dist = pre_dist + post_dist;
+			var swap_dist = swap_pre_dist + swap_post_dist;
+			if(swap_dist < dist)
+			{
+				var temp = tsp_order[i+1];
+				tsp_order[i+1] = tsp_order[i];
+				tsp_order[i] = temp;	
+			}
+			i++;
 		}
 	}
 	tsp_route.push(start);
+	for(var i = 1; i < tsp_order.length - 1; i++)
+	{
+		if(tsp_order[i] <= points.length)
+		{
+			tsp_route.push(points[tsp_order[i] - 1]);
+		}
+		else
+		{
+			var route_arr = routes[route_pos(tsp_order[i])];
+			if(route_dir(tsp_order[i]) == 1)
+			{
+				route_arr.reverse();
+			}
+			for(var j = 0; j < route_arr.length; j++)
+			{
+				tsp_route.push(route_arr[j]);
+			}
+			i++;
+		}
+	}
+	for(var i = 1; i < tsp_route.length; i++)
+	{
+		tsp_route[i].setId(i.toString());
+	} 
+	tsp_route.push(start);
+};
+
+var print_arr = function(arr) {
+	var str = "["
+	for(var i = 0; i < arr.length; i++)
+	{
+		str += arr[i];
+		if(i < arr.length-1)
+		{
+			str += ', ';
+		}
+	}
+	str += ']';
+	console.log(str)
 };
